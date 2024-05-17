@@ -6,7 +6,7 @@ resource "azurerm_resource_group" "rg" {
 }
 
 resource "azurerm_storage_account" "sa" {
-  name                     = "sa${var.project_id}${var.env}eau001"
+  name                     = "st${var.project_id}${var.env}eau001"
   resource_group_name      = azurerm_resource_group.rg.name
   location                 = azurerm_resource_group.rg.location
   account_tier             = "Standard"
@@ -50,25 +50,4 @@ resource "azurerm_linux_web_app" "webapp" {
       node_version = "16-lts"
     }
   }
-}
-
-#  Deploy code from a public GitHub repo
-resource "azurerm_app_service_source_control" "sourcecontrol" {
-  app_id                 = azurerm_linux_web_app.webapp.id
-  repo_url               = "https://github.com/Stephen-Hallett/ReviewMap"
-  branch                 = "main"
-  use_manual_integration = false
-  use_mercurial          = false
-  github_action_configuration {
-    code_configuration {
-      runtime_stack   = "node"
-      runtime_version = "v16.20.2"
-    }
-  }
-}
-
-resource "azurerm_source_control_token" "source_control_token" {
-  type         = "GitHub"
-  token        = var.github_auth_token
-  token_secret = var.github_auth_token
 }
