@@ -1,0 +1,1 @@
+terraform -chdir=deploy apply deployment.tfplan

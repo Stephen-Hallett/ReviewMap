@@ -1,0 +1,7 @@
+*/*venv
+*/.env
+infra/setup.local.sh
+infra/deploy/.terraform*
+infra/deploy/terraform.tfstate*
+infra/deploy/*.tfplan
+infra/.terraform*

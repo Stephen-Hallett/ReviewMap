@@ -1,0 +1,14 @@
+// overwrite theme variables
+
+
+$primary: #F04354;
+$secondary: #43B6F0;
+$light: #FFF2FA;
+
+.btn-primary:active {
+    --bs-btn-active-bg:#ff79c6;
+    --bs-btn-active-border-color: #ff79c6;
+    --bs-btn-active-color: #44475a;
+  }
+
+@import "~bootstrap/scss/bootstrap.scss";

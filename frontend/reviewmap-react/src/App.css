@@ -1,0 +1,30 @@
+:root {
+  --primary: #F04354;
+  --secondary: #43B6F0;
+  --light: #FFF2FA;
+}
+
+#root{
+  width:100vw;
+  height:100vh;
+}
+
+.App {
+  text-align: center;
+  width:100vw;
+  height:100vh;
+  display:flex;
+  flex-direction: column;
+}
+
+.navbar{
+  height:50px;
+  display:flex;
+  flex-direction: row;
+  justify-content: space-between;
+  background-color: var(--primary);
+}
+
+.map-container{
+  height:100%;
+}
