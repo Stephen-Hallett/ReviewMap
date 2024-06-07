@@ -28,6 +28,18 @@ resource "azurerm_storage_table" "categories" {
   storage_account_name = azurerm_storage_account.sa.name
 }
 
+resource "azurerm_storage_table" "cafe-table" {
+  name                 = "cafetable"
+  storage_account_name = azurerm_storage_account.sa.name
+}
+
+resource "azurerm_storage_blob" "cafe-folder" {
+  name                 = "cafe"
+  storage_account_name   = azurerm_storage_account.sa.name
+  storage_container_name = azurerm_storage_container.assets-container.name
+  type                   = "Block"
+}
+
 resource "azurerm_service_plan" "asp" {
   name                = "asp-${var.project_id}-${var.env}-eau-001"
   resource_group_name = azurerm_resource_group.rg.name
