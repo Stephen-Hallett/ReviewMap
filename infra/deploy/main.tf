@@ -1,5 +1,7 @@
 data "azurerm_client_config" "current" {}
 
+data "azurerm_subscription" "primary" {}
+
 resource "azurerm_resource_group" "rg" {
   name     = "rg-${var.project_id}-${var.env}-eau-001"
   location = "australiaeast"
@@ -28,18 +30,6 @@ resource "azurerm_storage_table" "categories" {
   storage_account_name = azurerm_storage_account.sa.name
 }
 
-resource "azurerm_storage_table" "cafe-table" {
-  name                 = "cafetable"
-  storage_account_name = azurerm_storage_account.sa.name
-}
-
-resource "azurerm_storage_blob" "cafe-folder" {
-  name                 = "cafe"
-  storage_account_name   = azurerm_storage_account.sa.name
-  storage_container_name = azurerm_storage_container.assets-container.name
-  type                   = "Block"
-}
-
 resource "azurerm_service_plan" "asp" {
   name                = "asp-${var.project_id}-${var.env}-eau-001"
   resource_group_name = azurerm_resource_group.rg.name
@@ -62,4 +52,10 @@ resource "azurerm_linux_web_app" "webapp" {
       node_version = "16-lts"
     }
   }
+}
+
+resource "azurerm_role_assignment" "table-contrib" {
+  scope                = azurerm_storage_account.sa.id
+  role_definition_name = "Storage Table Data Contributor"
+  principal_id         = var.user_object_id
 }

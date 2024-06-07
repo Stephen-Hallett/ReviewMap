@@ -3,6 +3,7 @@ export ARM_CLIENT_SECRET="*********************************************"
 export ARM_SUBSCRIPTION_ID="*********************************************"
 export ARM_TENANT_ID="*********************************************"
 export ARM_ACCESS_KEY="*********************************************"
+export USER_OBJECT_ID="*********************************************"
 
 echo "Variables exported!"
 

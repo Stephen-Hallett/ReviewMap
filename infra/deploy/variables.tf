@@ -16,6 +16,10 @@ variable "tenant_id" {
   type = string
 }
 
+variable "user_object_id" {
+  type = string
+}
+
 #COMMON VARIABLES
 variable "project_id" {
   type = string

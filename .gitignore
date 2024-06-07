@@ -5,3 +5,4 @@ infra/deploy/.terraform*
 infra/deploy/terraform.tfstate*
 infra/deploy/*.tfplan
 infra/.terraform*
+backend/import_data/images/*
