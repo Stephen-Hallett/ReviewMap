@@ -6,3 +6,5 @@ infra/deploy/terraform.tfstate*
 infra/deploy/*.tfplan
 infra/.terraform*
 backend/import_data/images/*
+backend/node_modules
+backend/package-*

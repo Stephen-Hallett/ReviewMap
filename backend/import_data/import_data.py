@@ -37,8 +37,8 @@ for cafe in cafes:
     ) = cafe
 
     item = {
-        "PartitionKey": str(id_val - 1),
-        "RowKey": "Cafe",
+        "PartitionKey": "Cafe",
+        "RowKey": str(id_val - 1),
         "Name": name,
         "Latitude": latitude,
         "Longitude": longitude,
@@ -60,8 +60,8 @@ for cafe in cafes:
     locations_table.upsert_entity(item)
 
 cafe_item = {
-    "PartitionKey": "0",
-    "RowKey": "Cafe",
+    "PartitionKey": "Cafe",
+    "RowKey": "0",
     "Generic1": "Food Rating",
     "Generic2": "Ambience Rating",
     "Generic3": None,
