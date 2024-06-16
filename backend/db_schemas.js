@@ -2,11 +2,11 @@ const categorySchema = {
   $schema: "http://json-schema.org/draft-07/schema#",
   type: "object",
   properties: {
-    PartitionKey: {
+    partitionKey: {
       type: "string",
       description: "The category name",
     },
-    RowKey: {
+    rowKey: {
       type: "string",
       description: "Unique index value starting at 0 and increasing by 1",
     },
@@ -28,7 +28,7 @@ const categorySchema = {
         "Rating that is specific to the category & will have seperate Stephen & Sans ratings",
     },
   },
-  required: ["PartitionKey", "RowKey", "Special"],
+  required: ["partitionKey", "rowKey", "Special"],
   additionalProperties: false,
 };
 
@@ -36,11 +36,11 @@ const locationSchema = {
   $schema: "http://json-schema.org/draft-07/schema#",
   type: "object",
   properties: {
-    PartitionKey: {
+    partitionKey: {
       type: "string",
       description: "The category name",
     },
-    RowKey: {
+    rowKey: {
       type: "string",
       description: "Unique index value starting at 0 and increasing by 1",
     },
@@ -106,8 +106,8 @@ const locationSchema = {
     },
   },
   required: [
-    "PartitionKey",
-    "RowKey",
+    "partitionKey",
+    "rowKey",
     "Name",
     "Address",
     "SpecialSans",
