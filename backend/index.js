@@ -74,7 +74,7 @@ async function postEntity(endpoint, entity) {
     console.log(
       `Upserting ${entity["partitionKey"]} ${endpoint} with ID ${entity["rowKey"]}`
     );
-    let result = await client.upsertEntity(entity, "Merge");
+    let result = await client.upsertEntity(entity, "Replace");
     console.log(result);
     return 200;
   }
