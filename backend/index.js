@@ -1,7 +1,6 @@
 const express = require('express');
 const cors = require('cors');
 const { TableServiceClient, TableClient, AzureNamedKeyCredential, odata } = require("@azure/data-tables");
-const app = express();
 const dotenv = require('dotenv');
 dotenv.config();
 
@@ -10,11 +9,16 @@ const connectionString = process.env.AZURE_TABLE_CONNECTION
 const locationsClient = TableClient.fromConnectionString(connectionString, 'locations');
 const categoriesClient = TableClient.fromConnectionString(connectionString, 'categories');
 
-async function fetchEntities() {
-    const entities = locationsClient.listEntities({
-        queryOptions: {}
-    });
-
+async function fetchEntities(filters = null) {
+    let entities;
+    if (filters == null){
+        entities = locationsClient.listEntities({});
+    } else {
+        console.log(filters)
+        entities = locationsClient.listEntities({
+            queryOptions: {filter: filters}
+        });
+    }
     let topEntities = [];
     const iterator = entities.byPage();
 
@@ -25,8 +29,13 @@ async function fetchEntities() {
     return(topEntities);
 }
 
+function capitalize(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+}
 
+const app = express();
 app.use(cors())
+app.use(express.json())
 
 app.listen(8080, () => {
     console.log('listening on port 8080')
@@ -38,7 +47,12 @@ app.get('/', (req, res) => {
 
 app.get('/locations', async (req, res) => {
     try {
-        const topEntities = await fetchEntities();
+        const queries = req.query;
+        let filters = [];
+        Object.keys(queries).forEach(function(key) { 
+            filters.push(capitalize(odata`${key} eq ${queries[key]}`));
+        })
+        const topEntities = await fetchEntities(filters.join(" and "));
         res.json(topEntities);
     } catch (error) {
         console.error('Error fetching entities:', error);
