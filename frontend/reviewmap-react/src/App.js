@@ -1,36 +1,50 @@
-import './App.css';
-import NavbarComponent from './components/navbar';
+import "./App.css";
+import NavbarComponent from "./components/navbar";
 import "mapbox-gl/dist/mapbox-gl.css";
 
+import { Map, FullscreenControl } from "react-map-gl";
+import React, { useEffect, useState } from "react";
 
-
-import {Map, FullscreenControl} from 'react-map-gl'
-import React, {useState} from "react";
-
-//const TOKEN = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN; // Set your mapbox token here
-
-const TOKEN = "pk.eyJ1Ijoic3RldmFsaW5pIiwiYSI6ImNsOGYwazg4czAzMmczbm5ndjRoZ3podXkifQ.8QQzHOriQiNkgg68Wswhpw";
+const TOKEN = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN; // Set your mapbox token here
+const backend_url = "http://127.0.0.1:8080";
 
 function App() {
   const [viewState, setViewState] = useState({
     longitude: 174.7599,
     latitude: -36.8589,
-    zoom: 10
+    zoom: 10,
   });
+  const [locations, setLocations] = useState([]);
+
+  useEffect(() => {
+    const fetchLocations = async () => {
+      const endpoint = backend_url + "/location";
+
+      const response = await fetch(endpoint);
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      const result = await response.json();
+      setLocations(result);
+    };
+    fetchLocations();
+  }, []);
+
+  console.log(locations);
 
   return (
     <div className="App">
       <>
-      <NavbarComponent/>
-        <div className='map-container'>
-          <Map 
-          {...viewState} 
-          onMove={evt => setViewState(evt.viewState)}
-          mapStyle="mapbox://styles/mapbox/streets-v9"
-          mapboxAccessToken={TOKEN}
-          onRender={(event) => event.target.resize()}
+        <NavbarComponent />
+        <div className="map-container">
+          <Map
+            {...viewState}
+            onMove={(evt) => setViewState(evt.viewState)}
+            mapStyle="mapbox://styles/mapbox/streets-v9"
+            mapboxAccessToken={TOKEN}
+            onRender={(event) => event.target.resize()}
           >
-          <FullscreenControl />
+            <FullscreenControl />
           </Map>
         </div>
       </>
