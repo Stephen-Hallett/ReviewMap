@@ -17,7 +17,7 @@ function App() {
     zoom: 10,
   });
   const [locations, setLocations] = useState([]);
-  const [categories, setCategories] = useState([]);
+  const [categories, setCategories] = useState({});
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -28,7 +28,13 @@ function App() {
         throw new Error("Network response was not ok");
       }
       const result = await response.json();
-      setCategories(result);
+      var categories_dict = {};
+      function populate_dict(category) {
+        categories_dict[category.partitionKey] = category;
+      }
+      result.forEach(populate_dict);
+
+      setCategories(categories_dict);
     };
     fetchCategories();
   }, []);
@@ -47,7 +53,7 @@ function App() {
     fetchLocations();
   }, []);
 
-  console.log(locations);
+  console.log(categories);
 
   return (
     <div className="App">
@@ -68,8 +74,9 @@ function App() {
                       longitude={item.Longitude}
                       latitude={item.Latitude}
                       anchor="bottom"
+                      key={item.rowKey}
                     >
-                      <Pin colour="#46afc7" />
+                      <Pin colour={categories[item.partitionKey].Colour} />
                     </Marker>
                   );
                 })
