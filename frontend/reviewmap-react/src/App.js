@@ -1,6 +1,8 @@
 import "./App.css";
 import NavbarComponent from "./components/navbar";
 import "mapbox-gl/dist/mapbox-gl.css";
+import { Marker } from "react-map-gl";
+import Pin from "./components/pin";
 
 import { Map, FullscreenControl } from "react-map-gl";
 import React, { useEffect, useState } from "react";
@@ -15,6 +17,21 @@ function App() {
     zoom: 10,
   });
   const [locations, setLocations] = useState([]);
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      const endpoint = backend_url + "/category";
+
+      const response = await fetch(endpoint);
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      const result = await response.json();
+      setCategories(result);
+    };
+    fetchCategories();
+  }, []);
 
   useEffect(() => {
     const fetchLocations = async () => {
@@ -44,6 +61,19 @@ function App() {
             mapboxAccessToken={TOKEN}
             onRender={(event) => event.target.resize()}
           >
+            {locations.length > 0
+              ? locations.map((item) => {
+                  return (
+                    <Marker
+                      longitude={item.Longitude}
+                      latitude={item.Latitude}
+                      anchor="bottom"
+                    >
+                      <Pin colour="#46afc7" />
+                    </Marker>
+                  );
+                })
+              : null}
             <FullscreenControl />
           </Map>
         </div>
