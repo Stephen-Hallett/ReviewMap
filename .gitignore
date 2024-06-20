@@ -9,3 +9,4 @@ backend/import_data/images/*
 backend/node_modules
 backend/package-lock.json
 frontend/reviewmap-react/.venv
+frontend/reviewmap-react/package-lock.json
