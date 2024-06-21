@@ -1,10 +1,9 @@
 import "./App.css";
 import NavbarComponent from "./components/navbar";
 import "mapbox-gl/dist/mapbox-gl.css";
-import { Marker } from "react-map-gl";
 import Pin from "./components/pin";
 
-import { Map, FullscreenControl } from "react-map-gl";
+import { Map, FullscreenControl, Marker, Popup } from "react-map-gl";
 import React, { useEffect, useState } from "react";
 
 const TOKEN = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN; // Set your mapbox token here
@@ -18,6 +17,7 @@ function App() {
   });
   const [locations, setLocations] = useState([]);
   const [categories, setCategories] = useState({});
+  const [popups, setPopups] = useState([]);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -49,11 +49,25 @@ function App() {
       }
       const result = await response.json();
       setLocations(result);
+      setPopups(Array(result.length).fill(false));
     };
     fetchLocations();
   }, []);
 
+  const handleMove = (evt) => {
+    setViewState(evt.viewState);
+    setPopups(Array(locations.length).fill(false));
+  }
+
+  const handleMarkerClick = (index) => {
+    console.log("Clicked!");
+    const newPopups = [...popups];
+    newPopups[index] = true;
+    setPopups(newPopups);
+  };
+
   console.log(categories);
+  console.log(popups)
 
   return (
     <div className="App">
@@ -62,22 +76,34 @@ function App() {
         <div className="map-container">
           <Map
             {...viewState}
-            onMove={(evt) => setViewState(evt.viewState)}
+            onMove={(evt) => handleMove(evt)}
             mapStyle="mapbox://styles/mapbox/streets-v9"
             mapboxAccessToken={TOKEN}
             onRender={(event) => event.target.resize()}
           >
             {locations.length > 0
-              ? locations.map((item) => {
+              ? locations.map((item, index) => {
+                console.log(popups[index])
                   return (
-                    <Marker
+                    <React.Fragment key={item.rowKey}>
+                      <Marker
+                        longitude={item.Longitude}
+                        latitude={item.Latitude}
+                        anchor="bottom"
+                        key={item.rowKey}
+                        onClick={() => handleMarkerClick(index)}
+                      >
+                        <Pin colour={categories[item.partitionKey].Colour} />
+                      </Marker>
+                      {true && (<Popup
                       longitude={item.Longitude}
                       latitude={item.Latitude}
                       anchor="bottom"
-                      key={item.rowKey}
-                    >
-                      <Pin colour={categories[item.partitionKey].Colour} />
-                    </Marker>
+                      offset={35}
+                      >
+                        Testing
+                      </Popup>)}
+                    </React.Fragment>
                   );
                 })
               : null}
