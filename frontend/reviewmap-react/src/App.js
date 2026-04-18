@@ -70,10 +70,10 @@ function App() {
   console.log(popups)
 
   return (
-    <div className="App">
+    <div className="w-screen h-screen flex flex-col text-center">
       <>
         <NavbarComponent />
-        <div className="map-container">
+        <div className="h-full">
           <Map
             {...viewState}
             onMove={(evt) => handleMove(evt)}
