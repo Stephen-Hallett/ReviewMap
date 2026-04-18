@@ -91,15 +91,19 @@ function App() {
                         latitude={item.Latitude}
                         anchor="bottom"
                         key={item.rowKey}
-                        onClick={() => handleMarkerClick(index)}
+                        onClick={(e) => {
+                          e.originalEvent.stopPropagation();
+                          handleMarkerClick(index)
+                        }}
                       >
                         <Pin colour={categories[item.partitionKey].Colour} />
                       </Marker>
-                      {true && (<Popup
+                      {popups[index] && (<Popup
                       longitude={item.Longitude}
                       latitude={item.Latitude}
                       anchor="bottom"
                       offset={35}
+                      closeOnClick={false}
                       >
                         Testing
                       </Popup>)}
