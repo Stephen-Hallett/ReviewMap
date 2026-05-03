@@ -21,21 +21,11 @@ resource "azurerm_storage_container" "assets" {
   container_access_type = "blob"
 }
 
-# Log Analytics workspace — required by Container App Environment
-resource "azurerm_log_analytics_workspace" "law" {
-  name                = "law-${var.project_id}-${var.env}-eau-001"
-  resource_group_name = azurerm_resource_group.rg.name
-  location            = azurerm_resource_group.rg.location
-  sku                 = "PerGB2018"
-  retention_in_days   = 30
-}
-
 # Container App Environment
 resource "azurerm_container_app_environment" "cae" {
   name                       = "cae-${var.project_id}-${var.env}-eau-001"
   resource_group_name        = azurerm_resource_group.rg.name
   location                   = azurerm_resource_group.rg.location
-  log_analytics_workspace_id = azurerm_log_analytics_workspace.law.id
 }
 
 # Container App — FastAPI backend (image pulled from GitHub Container Registry)

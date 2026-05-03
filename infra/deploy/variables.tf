@@ -6,7 +6,6 @@ variable "client_secret" {
   sensitive = true
 }
 variable "tenant_id" { type = string }
-variable "user_object_id" { type = string }
 
 # Common
 variable "project_id" { type = string }
