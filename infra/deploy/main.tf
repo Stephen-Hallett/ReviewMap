@@ -50,10 +50,10 @@ resource "azurerm_container_app" "api" {
     value = var.ghcr_token
   }
 
-  secret {
-    name  = "database-url"
-    value = var.database_url
-  }
+  # secret {
+  #   name  = "database-url"
+  #   value = var.database_url
+  # }
 
   secret {
     name  = "storage-connection"

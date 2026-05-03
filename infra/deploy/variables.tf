@@ -15,11 +15,11 @@ variable "location" {
   default = "australiaeast"
 }
 
-# Database — Tailscale IP and credentials, populated after VM setup
-variable "database_url" {
-  type      = string
-  sensitive = true
-}
+# # Database — Tailscale IP and credentials, populated after VM setup
+# variable "database_url" {
+#   type      = string
+#   sensitive = true
+# }
 
 # GitHub Container Registry — username and PAT with read:packages scope
 variable "ghcr_username" {
