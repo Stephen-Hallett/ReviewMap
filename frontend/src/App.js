@@ -70,10 +70,10 @@ function App() {
   console.log(popups)
 
   return (
-    <div className="App">
+    <div className="w-screen h-screen flex flex-col text-center">
       <>
         <NavbarComponent />
-        <div className="map-container">
+        <div className="h-full">
           <Map
             {...viewState}
             onMove={(evt) => handleMove(evt)}
@@ -91,15 +91,19 @@ function App() {
                         latitude={item.Latitude}
                         anchor="bottom"
                         key={item.rowKey}
-                        onClick={() => handleMarkerClick(index)}
+                        onClick={(e) => {
+                          e.originalEvent.stopPropagation();
+                          handleMarkerClick(index)
+                        }}
                       >
                         <Pin colour={categories[item.partitionKey].Colour} />
                       </Marker>
-                      {true && (<Popup
+                      {popups[index] && (<Popup
                       longitude={item.Longitude}
                       latitude={item.Latitude}
                       anchor="bottom"
                       offset={35}
+                      closeOnClick={false}
                       >
                         Testing
                       </Popup>)}

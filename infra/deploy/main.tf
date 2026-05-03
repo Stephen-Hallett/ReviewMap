@@ -1,61 +1,115 @@
 data "azurerm_client_config" "current" {}
 
-data "azurerm_subscription" "primary" {}
-
 resource "azurerm_resource_group" "rg" {
   name     = "rg-${var.project_id}-${var.env}-eau-001"
-  location = "australiaeast"
+  location = var.location
 }
 
+# Storage account — blob container for images (public read)
 resource "azurerm_storage_account" "sa" {
-  name                     = "st${var.project_id}${var.env}eau001"
-  resource_group_name      = azurerm_resource_group.rg.name
-  location                 = azurerm_resource_group.rg.location
-  account_tier             = "Standard"
-  account_replication_type = "LRS"
+  name                            = "st${var.project_id}${var.env}eau001"
+  resource_group_name             = azurerm_resource_group.rg.name
+  location                        = azurerm_resource_group.rg.location
+  account_tier                    = "Standard"
+  account_replication_type        = "LRS"
+  allow_nested_items_to_be_public = true
 }
 
-resource "azurerm_storage_container" "assets-container" {
-  name                 = "assets"
-  storage_account_name = azurerm_storage_account.sa.name
+resource "azurerm_storage_container" "assets" {
+  name                  = "assets"
+  storage_account_id    = azurerm_storage_account.sa.id
+  container_access_type = "blob"
 }
 
-resource "azurerm_storage_table" "locations" {
-  name                 = "locations"
-  storage_account_name = azurerm_storage_account.sa.name
+# Container App Environment
+resource "azurerm_container_app_environment" "cae" {
+  name                       = "cae-${var.project_id}-${var.env}-eau-001"
+  resource_group_name        = azurerm_resource_group.rg.name
+  location                   = azurerm_resource_group.rg.location
 }
 
-resource "azurerm_storage_table" "categories" {
-  name                 = "categories"
-  storage_account_name = azurerm_storage_account.sa.name
-}
+# Container App — FastAPI backend (image pulled from GitHub Container Registry)
+# NOTE: After first deploy, add the Tailscale sidecar via:
+#   az containerapp update --name <name> --resource-group <rg> \
+#     --container-name tailscale --image tailscale/tailscale:latest \
+#     --set-env-vars TS_AUTHKEY=<key> TS_STATE_DIR=/var/lib/tailscale
+resource "azurerm_container_app" "api" {
+  name                         = "ca-${var.project_id}-${var.env}-eau-001"
+  container_app_environment_id = azurerm_container_app_environment.cae.id
+  resource_group_name          = azurerm_resource_group.rg.name
+  revision_mode                = "Single"
 
-resource "azurerm_service_plan" "asp" {
-  name                = "asp-${var.project_id}-${var.env}-eau-001"
-  resource_group_name = azurerm_resource_group.rg.name
-  location            = azurerm_resource_group.rg.location
-  os_type             = var.asp_os_type
-  sku_name            = var.asp_sku_name
-}
+  registry {
+    server               = "ghcr.io"
+    username             = var.ghcr_username
+    password_secret_name = "ghcr-token"
+  }
 
-# Create the web app, pass in the App Service Plan ID
-resource "azurerm_linux_web_app" "webapp" {
-  name                = var.app_name
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
-  service_plan_id     = azurerm_service_plan.asp.id
-  https_only          = true
-  site_config {
-    minimum_tls_version = "1.2"
-    always_on           = false #Deploying free tier webapp without this will fail
-    application_stack {
-      node_version = "16-lts"
+  secret {
+    name  = "ghcr-token"
+    value = var.ghcr_token
+  }
+
+  secret {
+    name  = "database-url"
+    value = var.database_url
+  }
+
+  secret {
+    name  = "storage-connection"
+    value = azurerm_storage_account.sa.primary_connection_string
+  }
+
+  template {
+    min_replicas = 0
+    max_replicas = 1
+
+    container {
+      name   = "api"
+      image  = "ghcr.io/${var.ghcr_username}/reviewmap-api:latest"
+      cpu    = 0.25
+      memory = "0.5Gi"
+
+      env {
+        name        = "DATABASE_URL"
+        secret_name = "database-url"
+      }
+
+      env {
+        name        = "AZURE_STORAGE_CONNECTION"
+        secret_name = "storage-connection"
+      }
+
+      env {
+        name  = "AZURE_STORAGE_CONTAINER"
+        value = "assets"
+      }
+    }
+  }
+
+  ingress {
+    external_enabled = true
+    target_port      = 8080
+    traffic_weight {
+      percentage      = 100
+      latest_revision = true
     }
   }
 }
 
-resource "azurerm_role_assignment" "table-contrib" {
-  scope                = azurerm_storage_account.sa.id
-  role_definition_name = "Storage Table Data Contributor"
-  principal_id         = var.user_object_id
+# Static Web App — React frontend (free tier)
+resource "azurerm_static_web_app" "frontend" {
+  name                = "stapp-${var.project_id}-${var.env}-eau-001"
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_resource_group.rg.location
+  sku_tier            = "Free"
+  sku_size            = "Free"
+}
+
+output "static_web_app_url" {
+  value = azurerm_static_web_app.frontend.default_host_name
+}
+
+output "container_app_url" {
+  value = azurerm_container_app.api.latest_revision_fqdn
 }
