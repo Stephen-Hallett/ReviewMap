@@ -66,7 +66,7 @@ resource "azurerm_container_app" "api" {
 
     container {
       name   = "api"
-      image  = "ghcr.io/${var.ghcr_username}/reviewmap-api:latest"
+      image  = "ghcr.io/${lower(var.ghcr_username)}/reviewmap-api:latest"
       cpu    = 0.25
       memory = "0.5Gi"
 
