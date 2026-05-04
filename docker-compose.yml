@@ -1,0 +1,32 @@
+services:
+  api:
+    build: 
+      context: .
+      dockerfile: backend/Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://reviewmap:reviewmap@db:5432/reviewmap
+      AZURE_STORAGE_CONNECTION: ${AZURE_STORAGE_CONNECTION}
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: reviewmap
+      POSTGRES_PASSWORD: reviewmap
+      POSTGRES_DB: reviewmap
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U reviewmap"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pgdata:
