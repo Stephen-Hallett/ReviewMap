@@ -19,6 +19,7 @@ provider "azurerm" {
 
 terraform {
   backend "azurerm" {
+    resource_group_name  = "rg-reviewmap-dev-eau-001"
     storage_account_name = "stterraformdeveau001"
     container_name       = "tfstate"
     key                  = "terraform.tfstate"
