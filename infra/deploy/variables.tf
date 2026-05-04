@@ -15,6 +15,11 @@ variable "location" {
   default = "australiaeast"
 }
 
+variable "static_web_app_location" {
+  type    = string
+  default = "eastasia"
+}
+
 # # Database — Tailscale IP and credentials, populated after VM setup
 # variable "database_url" {
 #   type      = string

@@ -71,11 +71,6 @@ resource "azurerm_container_app" "api" {
       memory = "0.5Gi"
 
       env {
-        name        = "DATABASE_URL"
-        secret_name = "database-url"
-      }
-
-      env {
         name        = "AZURE_STORAGE_CONNECTION"
         secret_name = "storage-connection"
       }
@@ -101,7 +96,7 @@ resource "azurerm_container_app" "api" {
 resource "azurerm_static_web_app" "frontend" {
   name                = "stapp-${var.project_id}-${var.env}-eau-001"
   resource_group_name = azurerm_resource_group.rg.name
-  location            = azurerm_resource_group.rg.location
+  location            = var.static_web_app_location
   sku_tier            = "Free"
   sku_size            = "Free"
 }
